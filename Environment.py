@@ -1,32 +1,17 @@
-from typing import List, Any
+from abc import ABC, abstractmethod
 
-class Environment:
-    def __init__(self, width: int, height: int):
-        self.width = width
-        self.height = height
-        self.agents = []
+class Environment(ABC):
+    def __init__(self):
+        pass
 
-    def observation_for(self, agent):
-        # Exemplo simples: devolve posição dos outros agentes
-        return {"positions": [a.position for a in self.agents if a != agent]}
+    @abstractmethod
+    def get_observation(self, agent):
+        pass
 
+    @abstractmethod
+    def apply_action(self, agent, action):
+        pass
+
+    @abstractmethod
     def update(self):
-        """Atualiza o estado global do ambiente (recursos, etc.)."""
         pass
-
-    def act(self, agent, action):
-        """Aplica ação no ambiente."""
-        # Atualiza estado do agente, calcula recompensa, etc.
-        pass
-
-    def update(self):
-        """Atualiza o estado global do ambiente (recursos, etc.)."""
-        pass
-
-
-
-
-
-
-
-
