@@ -1,32 +1,30 @@
-class Agent:
+from abc import ABC, abstractmethod
 
-
-    def __init__(self,x,y, name,ambient):
-        self.x = x
-        self.y = y
+class Agent(ABC):
+    def __init__(self, name: str):
         self.name = name
-        self.ambient=ambient
         self.sensors = []
-        self.current_observation = None
-        self.current_action = None
-        self.current_reward = 0
+        self.last_observation = None
 
-    def createAgent(self):
-        pass
+    @abstractmethod
+    def observe(self, observation):
+        self.last_observation = observation
 
-
-    def observation(self, observation):
-        self.current_observation=observation
-
-    def takeAction(self, action):
-        self.current_action=action
-
-    def evaluateCurrentState(self,reward):
+    @abstractmethod
+    def act(self):
+        """Retorna um objeto Action"""
         pass
 
     def install(self, sensor):
         self.sensors.append(sensor)
 
-    def comunicate(self, message, agent):
-        print("Agente ", self.id_agent, " a comunicar com agente ", agent.id_agent, ": ", message)
+    def evaluate(self, reward: float):
+        """Reforço externo do ambiente (para agentes de aprendizagem)."""
+        pass
 
+    def communicate(self, message: str, from_agent):
+        """Canal de comunicação simples."""
+        pass
+
+    def __repr__(self):
+        return f"Agent({self.name})"

@@ -1,89 +1,33 @@
-from Agent import *
-from Environment import *
+class SimulationEngine:
+    def __init__(self, environment, agents, visualizer=None):
+        self.env = environment
+        self.agents = agents
+        self.visualizer = visualizer
 
-class MotorSimulacao:
-    """
-    Motor simples de simulação com atributos fixos.
-    Controla o ciclo: observação -> ação -> atualização.
-    """
+    def run(self, steps=100, delay=0.1):
+        import time
 
-    def __init__(self):
-        self.tempo = 0
+        def step(i=0):
+            if i >= steps:
+                return
 
-        # Atributos fixos iniciais
-        self.ambiente = None
-        self.agentes = []
+            for agent in self.agents:
+                obs = self.env.get_observation(agent)
+                agent.observe(obs)
 
-    # ------------------------------
-    # cria()
-    # ------------------------------
-    def cria(self, ficheiro_param: str):
-        """
-        Nesta versão simples, ignora o ficheiro e cria tudo fixo.
-        """
-        print("Criando ambiente e agentes (fixos).")
+            for agent in self.agents:
+                action = agent.act()
+                self.env.apply_action(agent, action)
 
-        # Criar ambiente fixo (exemplo)
-        self.ambiente = Environment(width=10, height=10, self.agentes)
+            self.env.update()
 
-        # Criar agentes fixos
-        agente1 = Agent( 2, 3,"A1")
-        agente2 = Agent( 7, 5,"A1")
+            if self.visualizer:
+                self.visualizer.update()
 
-        self.agentes.append(agente1)
-        self.agentes.append(agente2)
+            self.visualizer.window.after(int(delay * 1000), step, i + 1)
 
-        # Registar no ambiente
-        self.ambiente.add_agent(agente1)
-        self.ambiente.add_agent(agente2)
+        step()
+        self.visualizer.start()
 
-        print("Configuração fixa criada.")
 
-    # ------------------------------
-    # listaAgentes()
-    # ------------------------------
-    def listaAgentes(self):
-        """Retorna a lista de agentes."""
-        return self.agentes
 
-    # ------------------------------
-    # executa()
-    # ------------------------------
-    def executa(self):
-        """Executa a simulação durante 5 passos (fixo)."""
-        print("Executando simulação por 5 passos...")
-
-        for _ in range(5):
-            self.passoSimulacao()
-
-        print("Simulação terminada.")
-
-    # ------------------------------
-    # passoSimulacao()
-    # ------------------------------
-    def passoSimulacao(self):
-        """Executa um ciclo de simulação."""
-        self.tempo += 1
-        print(f"\n--- PASSO {self.tempo} ---")
-
-        # 1. Observações
-        observacoes = {
-            ag: self.ambiente.observacao_para(ag)
-            for ag in self.agentes
-        }
-
-        # 2. Ações
-        acoes = {
-            ag: ag.age(observacoes[ag])
-            for ag in self.agentes
-        }
-
-        # 3. Executar ações
-        for agente, acao in acoes.items():
-            self.ambiente.agir(acao, agente)
-
-        # 4. Atualizar ambiente
-        self.ambiente.atualizacao()
-
-    def add_agent(self, agent):
-        self.agents.append(agent)
