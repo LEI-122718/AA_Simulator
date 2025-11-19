@@ -1,10 +1,19 @@
-import tkinter as tk
+from Foraging import Foraging
+from Lighthouse import Lighthouse
+from SimpleAgent import SimpleAgent
+from SimulationEngine import SimulationEngine
+from Vizualizer import Vizualizer
 
-root = tk.Tk()
-root.title("TESTE TKINTER")
-root.geometry("300x200")
 
-label = tk.Label(root, text="Se consegues ver isto, Tkinter está OK.", font=("Arial", 14))
-label.pack(pady=20)
+env = Lighthouse(10, 10, lighthouse_pos=(6, 7))
+agent = SimpleAgent("A1")
 
-root.mainloop()
+env.add_agent(agent, pos=(2, 2))
+
+vis = Vizualizer(env, [agent])
+
+
+sim = SimulationEngine(env, [agent], vis)
+sim.run(steps=30, delay=0.2)
+
+

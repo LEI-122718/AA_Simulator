@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 class Agent(ABC):
-    def __init__(self, name: str):
+    def __init__(self, name):
         self.name = name
         self.sensors = []
         self.last_observation = None
