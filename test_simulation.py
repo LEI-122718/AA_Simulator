@@ -1,19 +1,18 @@
+import numpy as np
+
+from Agent import Agent
 from Foraging import Foraging
-from Lighthouse import Lighthouse
-from SimpleAgent import SimpleAgent
-from SimulationEngine import SimulationEngine
-from Vizualizer import Vizualizer
 
+grid = np.zeros((10,10))
 
-env = Lighthouse(10, 10, lighthouse_pos=(6, 7))
-agent = SimpleAgent("A1")
+agent = Agent("A1", radius=1)
+env = Foraging(grid)
 
-env.add_agent(agent, pos=(2, 2))
+env.add_agent(agent, (5,5))
 
-vis = Vizualizer(env, [agent])
+obs = env.observation_for(agent)
 
+print(obs.get_map())
 
-sim = SimulationEngine(env, [agent], vis)
-sim.run(steps=30, delay=0.2)
 
 

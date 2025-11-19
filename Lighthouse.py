@@ -1,5 +1,5 @@
 import numpy as np
-from Environment import Environment
+from environments.Environment import Environment
 from Observation import Observation
 
 class Lighthouse(Environment):
@@ -36,18 +36,9 @@ class Lighthouse(Environment):
 
         return Observation({"direction": direction})
 
+
     def apply_action(self, agent, action):
-        x, y = self.agent_positions[agent]
-
-        if action.type.name == "UP":    y -= 1
-        if action.type.name == "DOWN":  y += 1
-        if action.type.name == "LEFT":  x -= 1
-        if action.type.name == "RIGHT": x += 1
-
-        y = np.clip(y, 0, self.grid.shape[0]-1)
-        x = np.clip(x, 0, self.grid.shape[1]-1)
-
-        self.agent_positions[agent] = np.array([x, y], dtype=int)
+        pass
 
     def update(self):
         pass

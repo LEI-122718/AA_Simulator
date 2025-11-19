@@ -1,5 +1,5 @@
 import numpy as np
-from Environment import Environment
+from environments.Environment import Environment
 from Observation import Observation
 from Action import ActionType
 
