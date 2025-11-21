@@ -1,18 +1,52 @@
 import numpy as np
+from Lighthouse import Lighthouse
+from SimpleAgent import SimpleAgent
+from LearningAgent import LearningAgent
+from LearningPolicy import LearningPolicy
+from SimulationEngine import SimulationEngine
+from Sensor import Sensor
 
-from Agent import Agent
-from Foraging import Foraging
+print("\n=== TESTE FAROL: REATIVO vs RL ===\n")
 
-grid = np.zeros((10,10))
+# -------- MAPA COM GRADIENTE + OBSTÁCULOS (EXEMPLO) --------
+grid = [
+    [4, 5, 6, -1, -1, 5, 4],
+    [4, -1, 7, 8, 7, 6, 5],
+    [5, -1, 8, 9, 8, -1, 6],
+    [6, 7, -1, 10, 9, -1, 7],  # farol (valor mais alto)
+    [5, 5, -1, 9, 8, 7, 6]
+]
 
-agent = Agent("A1", radius=1)
-env = Foraging(grid)
+lighthouse_pos = (3, 3)
 
-env.add_agent(agent, (5,5))
+# Ambiente
+env = Lighthouse(grid=grid, lighthouse_pos=lighthouse_pos)
 
-obs = env.observation_for(agent)
+# Sensores
+sensor = Sensor(radius=1)   # mini-mapa 3x3
 
-print(obs.get_map())
+# --------- AGENTES ---------
 
+reactive_agent = SimpleAgent(sensor)
+rl_agent = LearningAgent(policy=LearningPolicy(), sensor=sensor)
 
+env.add_agent(reactive_agent, (0, 0))
+env.add_agent(rl_agent, (6, 0))
 
+engine = SimulationEngine(env, [reactive_agent, rl_agent])
+
+# --------- SIMULAÇÃO ---------
+STEPS = 40
+
+for step in range(STEPS):
+    print(f"\n===== STEP {step} =====")
+
+    for agent in [reactive_agent, rl_agent]:
+        pos = env.agent_positions[agent]
+        print(f"{agent.__class__.__name__} posição: {pos}")
+
+        obs = env.get_observation(agent)
+        print("\n--- Mini-mapa observado ---")
+        obs.pretty_print()
+
+    engine.run_step()

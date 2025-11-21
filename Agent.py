@@ -1,50 +1,69 @@
-from abc import ABC, abstractmethod
-import random
-
+from abc import ABC
 from Action import Action, ActionType
 from Sensor import Sensor
 
 
-class Agent:
-    def __init__(self, name,radius, (x,y)):
+class Agent(ABC):
+    def __init__(self, name, radius):
         self.name = name
         self.sensor = Sensor(radius)
         self.last_obs = None
-        self.position= (x,y)
+
+    # ------------------------------------------------------------------
 
     def observe(self, observation):
+        """Guarda a última observação (mini-mapa)."""
         self.last_obs = observation
 
+    # ------------------------------------------------------------------
+
     def act(self):
-        perception = self.last_obs.get_map()
+        """
+        Política reativa:
+        - olha para as 4 células ortogonais no mini-mapa
+        - escolhe a com maior valor (luz - penalizações)
+        - se tudo for não interessante (<= 0), fica parado.
+        """
 
-        # só células adjacentes ortogonais
-        moves = {
-            (-1,0): ActionType.LEFT,
-            (1,0):  ActionType.RIGHT,
-            (0,-1): ActionType.UP,
-            (0,1):  ActionType.DOWN
-        }
-
-        # Filtrar posições livres
-        free = [(dx,dy) for (dx,dy) in moves if perception[(dx,dy)] == 0]
-
-        if not free:
+        if self.last_obs is None:
             return Action(ActionType.STAY)
 
-        dx, dy = random.choice(free)
-        return Action(moves[(dx,dy)])
+        local_map = self.last_obs.get_map()
 
+        # Movimentos ortogonais possíveis (no referencial local do agente)
+        directions = {
+            (0, -1): ActionType.UP,
+            (0, 1): ActionType.DOWN,
+            (-1, 0): ActionType.LEFT,
+            (1, 0): ActionType.RIGHT,
+        }
 
-    def avaliate_CurrentState(self):
-        perception=self.last_obs.get_map()
+        best_dir = None
+        best_value = -1e9
 
+        for (dx, dy), action_type in directions.items():
+            if (dx, dy) not in local_map:
+                continue
 
+            val = local_map[(dx, dy)]
 
-    @abstractmethod
-    def communicate(self, message: str, from_agent):
-        """Canal de comunicação simples."""
-        pass
+            # Se for obstáculo ou extremamente penalizado, ignora
+            # (valores muito negativos não interessam)
+            if val < -5:
+                continue
+
+            if val > best_value:
+                best_value = val
+                best_dir = (dx, dy)
+
+        # Se não encontrou nada melhor que zero, fica parado
+        if best_dir is None or best_value <= 0:
+            return Action(ActionType.STAY)
+
+        # Caso contrário, retorna a ação correspondente
+        return Action(directions[best_dir])
+
+    # ------------------------------------------------------------------
 
     def __repr__(self):
         return f"Agent({self.name})"
